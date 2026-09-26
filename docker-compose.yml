@@ -6,7 +6,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared_k59
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiYjk4OWQ1NThhYTY4MDVmYmIwNDM5ZDRkM2Q0ZjY2MDQiLCJ0IjoiMTQ3MDZmNDktNDc4YS00Mzk1LTk1M2ItYzc5NTFhZWRlMTE2IiwicyI6IlltTmxZMk0wWVdJdE16Um1PQzAwT0RnekxUZzVPVGt0WVRkak1EVTJaV0psWWpaaSJ9
+    command: tunnel --no-autoupdate run --token YOUT_TOKEN_HERE
     networks:
       - app_network
 
