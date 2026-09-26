@@ -1,14 +1,14 @@
-# DEMO WEB DÙNG COOKIE ĐỂ LOGIN VÀ DUY TRÌ LOGINED
-Logic làm ngay trên lớp cho 59kmt: 
+# WEB DÙNG COOKIE ĐỂ LOGIN VÀ DUY TRÌ LOGINED
+Logic cho web đơn giản này làm ngay trên lớp cho 59kmt: 
 - Sử dụng docker compose để triển khai các service, xem chi tiết tại [docker-compose.yml](./docker-compose.yml)
-- code web chỉ sử dụng html + js
+- code web chỉ sử dụng html + js : sử dụng AI để Gen code ngay trên lớp (có sửa đổi chút)
 - backend sử dụng nodered để truy vấn SQL tới MariaDB trả về json
 - cấu hình nodered bắt buộc đăng nhập tại file [./nodered/settings.js](./nodered/settings.js), chuỗi hash lấy tại [tool này](https://tms.tnut.edu.vn/pw.php)
 - web server sử dụng nginx
 - cấu hình nginx tại file [./nginx/nginx.conf](./nginx/nginx.conf) để điều hướng root tới thư mục ./html, điều hướng /api/ tới nodered:1880
 - sử dụng MariaDB làm cơ sở dữ liệu
 - sử dụng phpMyAdmin làm công cụ để quản trị MariaDB: tạo table, trường dữ liệu, nhập dữ liệu demo,...
-- dùng cloudflare để web truy cập online qua domain (cần domain xịn)
+- dùng cloudflare tunnel để web truy cập online qua domain (cần domain xịn trước đó để cấu hình router ánh xạ sub-domain tới nginx)
 
 # Kết quả:
 - Đã đăng nhập được bằng uid + pwd theo database
