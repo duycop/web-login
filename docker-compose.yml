@@ -1,0 +1,69 @@
+#version: '3.8'
+
+services:
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_k59
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiYjk4OWQ1NThhYTY4MDVmYmIwNDM5ZDRkM2Q0ZjY2MDQiLCJ0IjoiMTQ3MDZmNDktNDc4YS00Mzk1LTk1M2ItYzc5NTFhZWRlMTE2IiwicyI6IlltTmxZMk0wWVdJdE16Um1PQzAwT0RnekxUZzVPVGt0WVRkak1EVTJaV0psWWpaaSJ9
+    networks:
+      - app_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin_web
+    restart: always
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+    depends_on:
+      - mariadb
+    networks:
+      - app_network
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: my_app
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: user_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - app_network
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered_backend
+    restart: always
+    volumes:
+      - ./nodered:/data
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_web
+    restart: always
+    ports:
+      - "81:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./html:/usr/share/nginx/html:ro
+    depends_on:
+      - mariadb
+      - nodered
+    networks:
+      - app_network
+
+volumes:
+  mariadb_data:
+  nodered_data:
+
+networks:
+  app_network:
+    driver: bridge

@@ -1,0 +1,405 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8ac3abf75e5f88a7",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "mariadb_db",
+        "port": "3306",
+        "db": "my_app",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "3cc11d24.ff01a2",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "WARNING: please check you have started this container with a volume that is mounted to /data\\n otherwise any flow changes are lost when you redeploy or upgrade the container\\n (e.g. upgrade to a more recent node-red docker image).\\n  If you are using named volumes you can ignore this warning.\\n Double click or see info side panel to learn how to start Node-RED in Docker to save your work",
+        "info": "\nTo start docker with a bind mount volume (-v option), for example:\n\n```\ndocker run -it -p 1880:1880 -v /home/user/node_red_data:/data --name mynodered nodered/node-red\n```\n\nwhere `/home/user/node_red_data` is a directory on your host machine where you want to store your flows.\n\nIf you do not do this then you can experiment and redploy flows, but if you restart or upgrade the container the flows will be disconnected and lost. \n\nThey will still exist in a hidden data volume, which can be recovered using standard docker techniques, but that is much more complex than just starting with a named volume as described above.",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "6ea57de7c86f519f",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "url": "/login",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 220,
+        "wires": [
+            [
+                "d681fd0113a55cf9"
+            ]
+        ]
+    },
+    {
+        "id": "472d99591920afd8",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 900,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d681fd0113a55cf9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SQL",
+        "func": "const uid = msg.payload.uid;\nconst pwd = msg.payload.pwd;\nconst SQL = \"select uid,fullname,REPLACE(UUID(), '-', '') AS ck from Users where uid=? and pwd=?\";\nmsg.topic=SQL;\nmsg.payload = [uid,pwd]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 220,
+        "wires": [
+            [
+                "0c8ee3f8a6d4e28b"
+            ]
+        ]
+    },
+    {
+        "id": "0c8ee3f8a6d4e28b",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "8ac3abf75e5f88a7",
+        "name": "",
+        "x": 420,
+        "y": 220,
+        "wires": [
+            [
+                "6b9156ba5827d48d",
+                "ec4d01f76f1a6b24"
+            ]
+        ]
+    },
+    {
+        "id": "6b9156ba5827d48d",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 2",
+        "func": "if(msg.payload.length==1){\n    \n    msg.payload = {\n        ok: 1,\n        msg: \"login ok nhé!\",\n        uid:msg.payload[0].uid,\n        fullname: msg.payload[0].fullname,\n        ck:msg.payload[0].ck,\n    }\n}else{\n    msg.payload = {\n        ok: 0,\n        msg: \"có gì đó sai sai!\"\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 220,
+        "wires": [
+            [
+                "472d99591920afd8",
+                "1ae675ba644b7be9"
+            ]
+        ]
+    },
+    {
+        "id": "7148db8646e1a2be",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "url": "/check_logined",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 340,
+        "wires": [
+            [
+                "2e6c59b15ae1b0be"
+            ]
+        ]
+    },
+    {
+        "id": "5d99364d27654068",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 800,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "2e6c59b15ae1b0be",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SQL",
+        "func": "const ck = msg.payload.ck;\nconst SQL = \"select uid,fullname from Users where uid in (SELECT uid FROM `Cookies` where ck=?);\";\nmsg.topic=SQL;\nmsg.payload = [ck]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 380,
+        "wires": [
+            [
+                "782bcdf83a2c37e5"
+            ]
+        ]
+    },
+    {
+        "id": "782bcdf83a2c37e5",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "8ac3abf75e5f88a7",
+        "name": "",
+        "x": 460,
+        "y": 380,
+        "wires": [
+            [
+                "a1f9522d4f71b916"
+            ]
+        ]
+    },
+    {
+        "id": "a1f9522d4f71b916",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 1",
+        "func": "\n\nif(msg.payload.length==1){\n    msg.payload = {\n        ok: 1,\n        msg: \"login ok trước đó rồi nhé!\",\n        uid: msg.payload[0].uid,\n        fullname: msg.payload[0].fullname,\n    }\n}else{\n    msg.payload = {\n        ok: 0,\n        msg: \"ck này lởm!\"\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 380,
+        "wires": [
+            [
+                "5d99364d27654068"
+            ]
+        ]
+    },
+    {
+        "id": "1ae675ba644b7be9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SQL",
+        "func": "if(msg.payload.ok==1){\n    const SQL=\"insert into Cookies(uid,ck)values(?,?)\";\n    msg.topic=SQL;\n    msg.payload=[msg.payload.uid,msg.payload.ck];\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 300,
+        "wires": [
+            [
+                "afe2d2ab2206aca3"
+            ]
+        ]
+    },
+    {
+        "id": "afe2d2ab2206aca3",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "8ac3abf75e5f88a7",
+        "name": "",
+        "x": 900,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ec4d01f76f1a6b24",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "1dc8b4d5bb92545d",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "url": "/mat",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 500,
+        "wires": [
+            [
+                "e8ed32d8e927924a"
+            ]
+        ]
+    },
+    {
+        "id": "e8ed32d8e927924a",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "SQL",
+        "func": "const ck = msg.payload.ck;\nconst SQL = \"SELECT mon,diem FROM `Diem` where uid in (SELECT uid FROM `Cookies` where ck=?);\";\nmsg.topic=SQL;\nmsg.payload = [ck]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 500,
+        "wires": [
+            [
+                "f6a834398741db16"
+            ]
+        ]
+    },
+    {
+        "id": "f6a834398741db16",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "8ac3abf75e5f88a7",
+        "name": "",
+        "x": 420,
+        "y": 500,
+        "wires": [
+            [
+                "f545fdb83a546200"
+            ]
+        ]
+    },
+    {
+        "id": "f545fdb83a546200",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 210,
+        "y": 580,
+        "wires": [
+            [
+                "e19007b9083fe7b7"
+            ],
+            [
+                "2b6fac54c7047aac"
+            ]
+        ]
+    },
+    {
+        "id": "91c84cb2cc9ceaed",
+        "type": "template",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<h1>ok đây là mật</h1>\n {{payload}}",
+        "output": "str",
+        "x": 560,
+        "y": 540,
+        "wires": [
+            [
+                "4dae95ab28f6fbca"
+            ]
+        ]
+    },
+    {
+        "id": "2b6fac54c7047aac",
+        "type": "template",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "ko xem đc mat nhé\n",
+        "output": "str",
+        "x": 360,
+        "y": 640,
+        "wires": [
+            [
+                "4dae95ab28f6fbca"
+            ]
+        ]
+    },
+    {
+        "id": "4dae95ab28f6fbca",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "200",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "x": 540,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "e19007b9083fe7b7",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 3",
+        "func": "var html=''\nfor(var item of msg.payload){\n    html+=`Môn: ${item.mon} có Điểm : ${item.diem}<br>`\n}\nmsg.payload=html\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 580,
+        "wires": [
+            [
+                "91c84cb2cc9ceaed"
+            ]
+        ]
+    }
+]
