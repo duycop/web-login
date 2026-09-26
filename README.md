@@ -16,6 +16,10 @@ Logic làm ngay trên lớp cho 59kmt:
 - Duy trì đăng nhập : Sau khi đã đăng nhập thì các lần sau xem đc thông tin mật ngay mà ko phải đăng nhập lại
 - Dùng trình duyệt ẩn danh truy cập trực tiếp url mật cũng ko xem được thông tin mật
 
+# Chú ý: 
+- repo này ko dành cho sv nghỉ học, sv nghỉ học sẽ ko biết triển khai database như nào với project này!
+- các thao tác cài đặt thư viện trên nodered cũng không được mô tả trên file này, chỉ sv nghe giảng mới biết !
+- Mọi thắc mắc vui lòng gửi vào nhóm zalo của lớp với tinh thần học hỏi và xây dựng!
 
 ---
 
